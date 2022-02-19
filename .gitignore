@@ -1,0 +1,6 @@
+.python-version
+response.json
+responses/
+.idea
+__pycache__
+.env

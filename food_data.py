@@ -51,7 +51,7 @@ class FoodInfo(BaseModel):
         ).replace("None", "")
 
 
-async def calculate_food_nutrients(fdc_id: int, portion: float) -> FoodInfo:
+async def calculate_food_nutrients(fdc_id: str, portion: float) -> FoodInfo:
     """
     Calculate food nutrients of food item with specified FDC ID and mass.
 
@@ -64,6 +64,7 @@ async def calculate_food_nutrients(fdc_id: int, portion: float) -> FoodInfo:
             f"https://api.nal.usda.gov/fdc/v1/food/{fdc_id}",
             params={"api_key": FOOD_DATA_API_KEY, "format": "abridged"},
         ) as resp:
+            resp.raise_for_status()
             text = await resp.text()
 
     # with open('response.json', 'w') as f:
@@ -108,7 +109,7 @@ async def calculate_food_nutrients(fdc_id: int, portion: float) -> FoodInfo:
 
 
 async def main():
-    info = await calculate_food_nutrients(1900168, 100)
+    info = await calculate_food_nutrients("1900168", 100)
     print(info)
 
 

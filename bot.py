@@ -1,6 +1,7 @@
 import logging
 import os
 
+import aiohttp
 from aiogram import Bot, Dispatcher, executor, types
 
 import food_data
@@ -39,22 +40,33 @@ async def calculate_food_nutrients(message: types.Message):
         )
         return
 
-    food_info = await food_data.calculate_food_nutrients(fdc_id, mass)
-    await message.answer(
-        f"Food: {food_info.food}\n"
-        f"Mass: {food_info.mass}\n"
-        f"Energy, kcal: {food_info.energy}\n"
-        f"Protein, g: {food_info.protein}\n"
-        f"Carbohydrates, g: {food_info.carbohydrates}\n"
-        f"Sugar, g: {food_info.sugar}\n"
-        f"Fats, g: {food_info.fats}\n"
-        f"Saturated fat, g: {food_info.saturated_fat}\n"
-        f"Cholesterol, mg: {food_info.cholesterol}\n"
-        f"Vitamin C, mg: {food_info.vitamin_c}\n"
-        f"Fe, mg: {food_info.fe}\n"
-        f"Ca, mg: {food_info.ca}\n"
-        f"\nCSV (copy it and paste to Excel) \n{food_info}"
-    )
+    try:
+        food_info = await food_data.calculate_food_nutrients(fdc_id, mass)
+    except aiohttp.ClientResponseError as e:
+        await message.answer(
+            f"Got response with status code {e.status}. "
+            f"Make sure you entered correct FDC ID."
+        )
+    except Exception as e:
+        await message.answer(
+            f"Got unexpected error: {repr(e)}. \nContact the developer: @a1d4r"
+        )
+    else:
+        await message.answer(
+            f"Food: {food_info.food}\n"
+            f"Mass: {food_info.mass}\n"
+            f"Energy, kcal: {food_info.energy}\n"
+            f"Protein, g: {food_info.protein}\n"
+            f"Carbohydrates, g: {food_info.carbohydrates}\n"
+            f"Sugar, g: {food_info.sugar}\n"
+            f"Fats, g: {food_info.fats}\n"
+            f"Saturated fat, g: {food_info.saturated_fat}\n"
+            f"Cholesterol, mg: {food_info.cholesterol}\n"
+            f"Vitamin C, mg: {food_info.vitamin_c}\n"
+            f"Fe, mg: {food_info.fe}\n"
+            f"Ca, mg: {food_info.ca}\n"
+            f"\nCSV (copy it and paste to Excel) \n{food_info}"
+        )
 
 
 if __name__ == "__main__":

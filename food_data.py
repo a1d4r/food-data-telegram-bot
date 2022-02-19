@@ -1,8 +1,10 @@
 """
 FoodData Central API: https://fdc.nal.usda.gov/api-guide.html
 """
+import asyncio
 import os
 
+import aiohttp
 import requests
 from pydantic import BaseModel
 
@@ -50,7 +52,7 @@ class FoodInfo(BaseModel):
         ).replace("None", "")
 
 
-def calculate_food_nutrients(fdc_id: int, portion: float) -> FoodInfo:
+async def calculate_food_nutrients(fdc_id: int, portion: float) -> FoodInfo:
     """
     Calculate food nutrients of food item with specified FDC ID and mass.
 
@@ -58,10 +60,13 @@ def calculate_food_nutrients(fdc_id: int, portion: float) -> FoodInfo:
     :param portion: Mass of portion, in grams
     :return: information about food item
     """
-    response = requests.get(
-        f"https://api.nal.usda.gov/fdc/v1/food/{fdc_id}",
-        params={"api_key": FOOD_DATA_API_KEY, "format": "abridged"},
-    )
+    async with aiohttp.ClientSession() as session:
+        async with session.get(
+            f"https://api.nal.usda.gov/fdc/v1/food/{fdc_id}",
+            params={"api_key": FOOD_DATA_API_KEY, "format": "abridged"},
+        ) as resp:
+            text = await resp.text()
+
     # with open('response.json', 'w') as f:
     #     f.write(response.text)
     # food_item = InlineResponse200.parse_raw(response.text)
@@ -70,7 +75,7 @@ def calculate_food_nutrients(fdc_id: int, portion: float) -> FoodInfo:
     #     raw = f.read()
     # food_item = InlineResponse200.parse_raw(raw).__root__
     # food_item = AbridgedFoodItem.parse_raw(raw)
-    food_item = AbridgedFoodItem.parse_raw(response.text)
+    food_item = AbridgedFoodItem.parse_raw(text)
 
     food_info = FoodInfo(food=food_item.description.strip(), mass=portion)
     multiplier = portion / 100
@@ -78,7 +83,6 @@ def calculate_food_nutrients(fdc_id: int, portion: float) -> FoodInfo:
     for nutrient in food_item.food_nutrients:
         match nutrient.number:
             case "208" | "957":
-                print("OK")
                 food_info.energy = nutrient.amount * multiplier
             case "203":
                 food_info.protein = nutrient.amount * multiplier
@@ -104,6 +108,10 @@ def calculate_food_nutrients(fdc_id: int, portion: float) -> FoodInfo:
     return food_info
 
 
-if __name__ == "__main__":
-    info = calculate_food_nutrients(1900168, 100)
+async def main():
+    info = await calculate_food_nutrients(1900168, 100)
     print(info)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

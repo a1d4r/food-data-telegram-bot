@@ -41,7 +41,7 @@ async def calculate_food_nutrients(message: types.Message):
         )
         return
 
-    food_info = food_data.calculate_food_nutrients(fdc_id, mass)
+    food_info = await food_data.calculate_food_nutrients(fdc_id, mass)
     await message.answer(
         f"Food: {food_info.food}\n"
         f"Mass: {food_info.mass}\n"

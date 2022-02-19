@@ -5,7 +5,6 @@ import asyncio
 import os
 
 import aiohttp
-import requests
 from pydantic import BaseModel
 
 from models import AbridgedFoodItem

@@ -25,7 +25,6 @@ async def send_welcome(message: types.Message):
         "To use it, simply send a message containing FDC ID of the food and the mass "
         "of the portion in grams. These two values must be separated by space, for example: "
         "`167725 200`",
-        parse_mode=types.ParseMode.MARKDOWN_V2,
     )
 
 
@@ -37,7 +36,6 @@ async def calculate_food_nutrients(message: types.Message):
     except ValueError:
         await message.answer(
             "Invalid format. Should be: `fds_id grams`. For example: `167725 200`",
-            parse_mode=types.ParseMode.MARKDOWN_V2,
         )
         return
 

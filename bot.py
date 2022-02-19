@@ -65,7 +65,7 @@ async def calculate_food_nutrients(message: types.Message):
             f"Vitamin C, mg: {food_info.vitamin_c}\n"
             f"Fe, mg: {food_info.fe}\n"
             f"Ca, mg: {food_info.ca}\n"
-            f"\nCSV (copy it and paste to Excel) \n{food_info}"
+            f"\nCSV (copy it and paste to Excel): \n{food_info}"
         )
 
 

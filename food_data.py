@@ -5,7 +5,7 @@ import asyncio
 import os
 
 import aiohttp
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 from models import AbridgedFoodItem
 
@@ -26,6 +26,13 @@ class FoodInfo(BaseModel):
     vitamin_c: float | None = None
     fe: float | None = None
     ca: float | None = None
+
+    @validator('*')
+    def round_floats(cls, v):
+        """Round float number, so we don't get 0.11900000000000001"""
+        if isinstance(v, float):
+            return round(v, 3)
+        return v
 
     def __str__(self):
         """Comma separated string representation."""
@@ -49,6 +56,9 @@ class FoodInfo(BaseModel):
                 ),
             )
         ).replace("None", "")
+
+    class Config:
+        validate_assignment = True
 
 
 async def calculate_food_nutrients(fdc_id: str, portion: float) -> FoodInfo:

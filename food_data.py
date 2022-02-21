@@ -77,14 +77,6 @@ async def calculate_food_nutrients(fdc_id: str, portion: float) -> FoodInfo:
             resp.raise_for_status()
             text = await resp.text()
 
-    # with open('response.json', 'w') as f:
-    #     f.write(response.text)
-    # food_item = InlineResponse200.parse_raw(response.text)
-    #
-    # with open('response.json', 'r') as f:
-    #     raw = f.read()
-    # food_item = InlineResponse200.parse_raw(raw).__root__
-    # food_item = AbridgedFoodItem.parse_raw(raw)
     food_item = AbridgedFoodItem.parse_raw(text)
 
     food_info = FoodInfo(food=food_item.description.strip(), mass=portion)
